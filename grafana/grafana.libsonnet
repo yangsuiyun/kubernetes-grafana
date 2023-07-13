@@ -44,6 +44,7 @@ local defaults = {
   plugins: [],
   env: [],
   containers: [],
+  storage: null,
 };
 
 function(params) {
@@ -276,7 +277,6 @@ function(params) {
 
     local volumes =
       [
-        storageVolume,
         datasourcesVolume,
         dashboardsVolume,
         pluginTmpVolume,
@@ -306,7 +306,9 @@ function(params) {
         }
         for name in std.objectFields(g._config.rawDashboards)
       ] +
-      if std.length(g._config.config) > 0 then [configVolume] else [];
+      if std.length(g._config.config) > 0 then [configVolume] else [] +
+      if g._config.storage != null then [g._config.storage] else [storageVolume]
+    ;
 
     local plugins = (
       if std.length(g._config.plugins) == 0 then
