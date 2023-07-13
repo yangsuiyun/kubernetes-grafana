@@ -306,8 +306,8 @@ function(params) {
         }
         for name in std.objectFields(g._config.rawDashboards)
       ] +
-      if std.length(g._config.config) > 0 then [configVolume] else [] +
-      if g._config.storage != null then [g._config.storage] else [storageVolume]
+      (if std.length(g._config.config) > 0 then [configVolume] else []) +
+      (if g._config.storage != null then [g._config.storage] else [storageVolume])
     ;
 
     local plugins = (
