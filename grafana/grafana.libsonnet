@@ -44,7 +44,6 @@ local defaults = {
   plugins: [],
   env: [],
   containers: [],
-  storage: null,
 };
 
 function(params) {
@@ -55,6 +54,8 @@ function(params) {
     namespace: g._config.namespace,
     labels: g._config.commonLabels,
   },
+
+  [if 'storage' in params then 'storage']: params.storage,
 
   serviceAccount: {
     apiVersion: 'v1',
@@ -206,7 +207,9 @@ function(params) {
 
     local storageVolume = {
       name: 'grafana-storage',
-      emptyDir: {},
+      [if 'storage' in params then 'persistentVolumeClaim' else 'emptyDir']: {
+        [if 'storage' in params then 'claimName']: params.storage.metadata.name,
+      },
     };
     local storageVolumeMount = {
       name: storageVolume.name,
@@ -277,6 +280,7 @@ function(params) {
 
     local volumes =
       [
+        storageVolume,
         datasourcesVolume,
         dashboardsVolume,
         pluginTmpVolume,
@@ -306,9 +310,7 @@ function(params) {
         }
         for name in std.objectFields(g._config.rawDashboards)
       ] +
-      (if std.length(g._config.config) > 0 then [configVolume] else []) +
-      (if g._config.storage != null then [g._config.storage] else [storageVolume])
-    ;
+      (if std.length(g._config.config) > 0 then [configVolume] else []);
 
     local plugins = (
       if std.length(g._config.plugins) == 0 then
@@ -376,4 +378,6 @@ function(params) {
         },
       },
     },
+
+
 }

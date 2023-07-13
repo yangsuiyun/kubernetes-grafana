@@ -4,12 +4,13 @@ local grafana = import 'grafana/grafana.libsonnet';
   _config:: {
     namespace: 'monitoring-grafana',
     storage: {
-          apiVersion: 'v1',
+          name: 'v1',
           kind: 'PersistentVolumeClaim',
           metadata: {
             name: 'grafana-storage',
           },
-          spec: {
+          spec:
+          {
             accessModes: [
               'ReadWriteOnce',
             ],
